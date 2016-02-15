@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Bus stop finder #opendatani</title>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
+  <script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
+  <script src="src/l.control.geosearch.js"></script>
+  <script src="src/l.geosearch.provider.google.js"></script>
+  <script src='src/leaflet-knn.min.js'></script>
+  <script src='data/busedited.geojson'></script>
+  <script src='data/trainstop.geojson'></script>
+  <link rel="stylesheet" href="css/busfind.css" />
+  <link rel="stylesheet" href="css/l.geosearch.css" />
+
+  <style>
+
+  </style>
+</head>
+
+<body>
+  <h1>Find your nearest bus stops</h1>
+  <div class="map" id="map" style="width: 900px; height: 400px" align="center"></div>
+  <div class="wrapper">
+    <button id="find" onclick="findButtonClick()" align="center">Find my bus stop!</button>
+  </div>
+  <div class="text" id="found-address"></div>
+  <div class="text" id="bus-bracket"></div>
+  <div class="text" id="train-bracket"></div>
+  <div class="footer">Built by <a href="http://belfast.theodi.org">ODI Belfast</a> with <a href="https://www.opendatani.gov.uk/organization/translink">Translink Open Data</a> <a href="http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/">(OGL)</a>
+    <br />#opendatani</div>
+
+  <script>
+    var busbracket = document.getElementById("bus-bracket");
+    var trainbracket = document.getElementById("train-bracket");
+    busbracket.innerHTML = 'Allow location services, click on the map or enter an address in the search tool to find bus stops near to you';
+
+    var StopIcon = L.Icon.extend({
+      options: {
+		shadowUrl: 'img/shadow-icon.png',
+        iconSize: [40, 40],
+		shadowSize:  [50, 50],
+        popupAnchor: [0, 0]
+      }
+    });
+
+    var metroIcon = new StopIcon({
+        iconUrl: 'img/metro-icon.png'
+      }),
+      ulsterIcon = new StopIcon({
+        iconUrl: 'img/ulster-icon.png'
+      }),
+      trainIcon = new StopIcon({
+        iconUrl: 'img/train-icon.png'
+      });
+
+    function findTrain(e) {
+      var nearestT = leafletKnn(trainStationLayer).nearest(e.latlng, 1);
+      if (nearestT.length) {
+        var stop = nearestT[0];
+        var popUpContent = stop.layer.feature.properties.Station;
+        trainbracket.innerHTML = '<p>Your nearest train or bus station is ' + popUpContent + '<p>';
+        L.marker(stop, {
+          icon: trainIcon
+        }).addTo(map).bindPopup(popUpContent);
+      } else {
+        trainbracket.innerHTML = 'No nearby train or bus stations found';
+      };
+    }
+
+    function findBus(e) {
+      var emarker = L.marker([e.latitude, e.longitude]);
+      var nearestB = leafletKnn(busStopLayer).nearest(e.latlng, 5);
+      if (nearestB.length) {
+        var stop = nearestB[0];
+        var popUpContent = '<b>' + stop.layer.feature.properties.Stop_Name + '</b><br />[Service Direction: ' + stop.layer.feature.properties.ServiceDir;
+        var marker = L.marker(stop, {
+          icon: metroIcon
+        }).bindPopup(popUpContent);
+        marker.addTo(map);
+        busbracket.innerHTML = "Your nearest bus stop is <b>" + emarker.getLatLng().distanceTo(marker.getLatLng()).toFixed(0) + " meters</b> away at " + popUpContent + ']<p>';
+        if (nearestB.length > 0) {
+          busbracket.innerHTML += 'Other bus stops nearby:<br />';
+          for (i = 1; i < nearestB.length; i++) {
+            var stop = nearestB[i];
+            var popUpContent = '<b>' + stop.layer.feature.properties.Stop_Name + '</b> (' + emarker.getLatLng().distanceTo(L.marker(stop).getLatLng()).toFixed(0) + ' m)<br />[Service Direction: ' + stop.layer.feature.properties.ServiceDir;
+            if (stop.layer.feature.properties.DepotOpsAr == 'Belfast Metro Ops') {
+              L.marker(stop, {
+                icon: metroIcon
+              }).addTo(map).bindPopup(popUpContent);
+            } else {
+              L.marker(stop, {
+                icon: ulsterIcon
+              }).addTo(map).bindPopup(popUpContent);
+            }
+            busbracket.innerHTML += i + '. ' + popUpContent + ']<br />';
+          }
+        }
+      } else {
+        busbracket.innerHTML = 'No bus stops found<br />';
+      };
+    }
+
+    function onLocationFound(e) {
+      L.marker(e.latlng).bindPopup('You are here').openPopup().addTo(map);
+      document.getElementById('find').innerHTML = 'Location found';
+      findBus(e);
+      findTrain(e);
+      console.log(e);
+      console.log(e.latlng);
+    }
+
+    function onLocationError(e) {
+      alert(e.message);
+    }
+
+    function locator() {
+      map.locate({
+        setView: true,
+        maxZoom: 15
+      });
+    }
+
+    function findButtonClick() {
+      locator();
+    }
+
+
+
+    var map = L.map('map').setView([54.593346, -6.416200], 8);
+    mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
+    L.tileLayer(
+      'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; ' + mapLink + ' Contributors | Data: <a href="https://www.opendatani.gov.uk/organization/translink">Translink</a> <a href="http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/">Open Data (OGL)</a>',
+        maxZoom: 16,
+      }).addTo(map);
+
+    L.Map = L.Map.extend({
+      openPopup: function(popup) {
+        this._popup = popup;
+        return this.addLayer(popup).fire('popupopen', {
+          popup: this._popup
+        });
+      }
+    });
+
+    var busStopLayer = L.geoJson(busstops);
+    var trainStationLayer = L.geoJson(trainstops);
+
+    busStopLayer.addTo(map);
+    map.removeLayer(busStopLayer);
+
+    trainStationLayer.addTo(map);
+    map.removeLayer(trainStationLayer);
+
+    new L.Control.GeoSearch({
+      provider: new L.GeoSearch.Provider.Google(),
+      position: 'topright',
+    }).addTo(map);
+
+    map.on('load', locator());
+    map.on('locationfound', onLocationFound);
+    map.on('locationerror', onLocationError);
+    map.on('click', function(e) {
+      e.latitude = e.latlng.lat;
+      e.longitude = e.latlng.lng;
+      console.log(e);
+      onLocationFound(e);
+    });
+    map.on('geosearch_foundlocations', function(e) {
+      e.Locations.forEach(function(Location) {
+        e.latitude = Location.Y;
+        e.longitude = Location.X;
+        e.latlng = [Location.X, Location.Y];
+        console.log(e);
+      });
+      document.getElementById('found-address').innerHTML = '<b>Address found:</b> ' + e.Locations[0].Label + '<p>';
+      findBus(e);
+      findTrain(e);
+    });
+  </script>
+</body>
+
+</html>
