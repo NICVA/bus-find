@@ -83,7 +83,7 @@
           busbracket.innerHTML += 'Other bus stops nearby:';
           for (i = 1; i < nearestB.length; i++) {
             var stop = nearestB[i];
-            var popUpContent = '<b>' + stop.layer.feature.properties.Stop_Name + '</b> (' + emarker.getLatLng().distanceTo(L.marker(stop).getLatLng()).toFixed(0) + ' m)<br />[Service Direction: ' + stop.layer.feature.properties.ServiceDir;
+            var popUpContent = '<b>' + stop.layer.feature.properties.Stop_Name + '</b> (' + emarker.getLatLng().distanceTo(L.marker(stop).getLatLng()).toFixed(0) + ' m)<br /> [Service Direction: ' + stop.layer.feature.properties.ServiceDir;
             if (stop.layer.feature.properties.DepotOpsAr == 'Belfast Metro Ops') {
               L.marker(stop, {
                 icon: metroIcon
@@ -93,7 +93,7 @@
                 icon: ulsterIcon
               }).addTo(map).bindPopup(popUpContent);
             }
-            busbracket.innerHTML += i + '. ' + popUpContent + ']<br />';
+            busbracket.innerHTML += '<br />' + i + '. ' + popUpContent + ']';
           }
         }
       } else {
@@ -156,7 +156,6 @@
       position: 'topright',
     }).addTo(map);
 
-    map.on('load', locator());
     map.on('locationfound', onLocationFound);
     map.on('locationerror', onLocationError);
     map.on('click', function(e) {
