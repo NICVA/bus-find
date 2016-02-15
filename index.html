@@ -6,74 +6,16 @@
   <meta charset="utf-8" />
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
   <script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
-  <script src="l.control.geosearch.js"></script>
-  <script src="l.geosearch.provider.google.js"></script>
-  <script src='leaflet-knn.min.js'></script>
-  <script src='busedited.geojson'></script>
-  <script src='trainstop.geojson'></script>
-  <link rel="stylesheet" href="l.geosearch.css" />
+  <script src="src/l.control.geosearch.js"></script>
+  <script src="src/l.geosearch.provider.google.js"></script>
+  <script src='src/leaflet-knn.min.js'></script>
+  <script src='data/busedited.geojson'></script>
+  <script src='data/trainstop.geojson'></script>
+  <link rel="stylesheet" href="css/busfind.css" />
+  <link rel="stylesheet" href="css/l.geosearch.css" />
 
   <style>
-    .info {
-      padding: 6px 8px;
-      font: 16px Arial, Helvetica, sans-serif;
-      background: white;
-      background: rgba(255, 255, 255, 0.8);
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-      border-radius: 5px;
-    }
-    .info h4 {
-      margin: 0 0 5px;
-      color: #777;
-    }
-    h1 {
-      colour: black;
-      font-family: Arial, Helvetica, sans-serif;
-      text-align: center;
-    }
-    div.text {
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 20px;
-      width: 800px;
-      margin: auto;
-    }
-    .footer {
-      font-family: Arial, Helvetica, sans-serif;
-      font-size: 10px;
-      text-align: center;
-      padding-top: 5px;
-    }
-    div.map {
-      width: 100%;
-      height: 50%;
-      margin: auto;
-    }
-    button {
-      background-color: #3cba5d;
-      -moz-border-radius: 28px;
-      -webkit-border-radius: 28px;
-      border-radius: 28px;
-      border: 1px solid #11d925;
-      display: inline-block;
-      cursor: pointer;
-      color: #ffffff;
-      font-family: Arial;
-      font-size: 17px;
-      padding: 16px 31px;
-      text-decoration: none;
-      text-shadow: 0px 1px 0px #2f6627;
-    }
-    button:hover {
-      background-color: #5cbf2a;
-    }
-    button:active {
-      position: relative;
-      top: 1px;
-    }
-    .wrapper {
-      text-align: center;
-      padding: 20px 0px 30px;
-    }
+
   </style>
 </head>
 
@@ -96,19 +38,21 @@
 
     var StopIcon = L.Icon.extend({
       options: {
+		shadowUrl: 'img/shadow-icon.png',
         iconSize: [40, 40],
+		shadowSize:  [50, 50],
         popupAnchor: [0, 0]
       }
     });
 
     var metroIcon = new StopIcon({
-        iconUrl: 'metro-icon.png'
+        iconUrl: 'img/metro-icon.png'
       }),
       ulsterIcon = new StopIcon({
-        iconUrl: 'ulster-icon.png'
+        iconUrl: 'img/ulster-icon.png'
       }),
       trainIcon = new StopIcon({
-        iconUrl: 'train-icon.png'
+        iconUrl: 'img/train-icon.png'
       });
 
     function findTrain(e) {
