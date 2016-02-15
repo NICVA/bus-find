@@ -21,15 +21,14 @@
 
 <body>
   <h1>Find your nearest bus stops</h1>
-  <div class="map" id="map" style="width: 900px; height: 400px" align="center"></div>
+  <div class="map" id="map" style="width:100%; height: 50%" align="center"></div>
   <div class="wrapper">
-    <button id="find" onclick="findButtonClick()" align="center">Find my bus stop!</button>
+    <button id="find" onclick="findButtonClick()">Find my bus stop!</button>
   </div>
   <div class="text" id="found-address"></div>
   <div class="text" id="bus-bracket"></div>
   <div class="text" id="train-bracket"></div>
-  <div class="footer">Built by <a href="http://belfast.theodi.org">ODI Belfast</a> with <a href="https://www.opendatani.gov.uk/organization/translink">Translink Open Data</a> <a href="http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/">(OGL)</a>
-    <br />#opendatani</div>
+  <footer class="site-footer">Built by <a href="http://belfast.theodi.org">ODI Belfast</a> with <a href="https://www.opendatani.gov.uk/organization/translink">Translink Open Data</a> (<a href="http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/">OGL</a>) #opendatani</footer>
 
   <script>
     var busbracket = document.getElementById("bus-bracket");
@@ -60,12 +59,12 @@
       if (nearestT.length) {
         var stop = nearestT[0];
         var popUpContent = stop.layer.feature.properties.Station;
-        trainbracket.innerHTML = '<p>Your nearest train or bus station is ' + popUpContent + '<p>';
+        trainbracket.innerHTML = '<p>Your nearest train or bus station is <b>' + popUpContent + '</b></p>';
         L.marker(stop, {
           icon: trainIcon
         }).addTo(map).bindPopup(popUpContent);
       } else {
-        trainbracket.innerHTML = 'No nearby train or bus stations found';
+        trainbracket.innerHTML = '<p>No nearby train or bus stations found </p>';
       };
     }
 
@@ -74,14 +73,14 @@
       var nearestB = leafletKnn(busStopLayer).nearest(e.latlng, 5);
       if (nearestB.length) {
         var stop = nearestB[0];
-        var popUpContent = '<b>' + stop.layer.feature.properties.Stop_Name + '</b><br />[Service Direction: ' + stop.layer.feature.properties.ServiceDir;
+        var popUpContent = '<b>' + stop.layer.feature.properties.Stop_Name + '</b> [Service Direction: <b>' + stop.layer.feature.properties.ServiceDir + '</b>';
         var marker = L.marker(stop, {
           icon: metroIcon
         }).bindPopup(popUpContent);
         marker.addTo(map);
-        busbracket.innerHTML = "Your nearest bus stop is <b>" + emarker.getLatLng().distanceTo(marker.getLatLng()).toFixed(0) + " meters</b> away at " + popUpContent + ']<p>';
+        busbracket.innerHTML = "<p>Your nearest bus stop is <b>" + emarker.getLatLng().distanceTo(marker.getLatLng()).toFixed(0) + " meters</b> away at " + popUpContent + ']</p>';
         if (nearestB.length > 0) {
-          busbracket.innerHTML += 'Other bus stops nearby:<br />';
+          busbracket.innerHTML += 'Other bus stops nearby:';
           for (i = 1; i < nearestB.length; i++) {
             var stop = nearestB[i];
             var popUpContent = '<b>' + stop.layer.feature.properties.Stop_Name + '</b> (' + emarker.getLatLng().distanceTo(L.marker(stop).getLatLng()).toFixed(0) + ' m)<br />[Service Direction: ' + stop.layer.feature.properties.ServiceDir;
@@ -98,7 +97,7 @@
           }
         }
       } else {
-        busbracket.innerHTML = 'No bus stops found<br />';
+        busbracket.innerHTML = 'No bus stops found';
       };
     }
 
@@ -126,14 +125,12 @@
       locator();
     }
 
-
-
     var map = L.map('map').setView([54.593346, -6.416200], 8);
     mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
     L.tileLayer(
       'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; ' + mapLink + ' Contributors | Data: <a href="https://www.opendatani.gov.uk/organization/translink">Translink</a> <a href="http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/">Open Data (OGL)</a>',
-        maxZoom: 16,
+        maxZoom: 19,
       }).addTo(map);
 
     L.Map = L.Map.extend({
@@ -179,6 +176,7 @@
       findBus(e);
       findTrain(e);
     });
+	
   </script>
 </body>
 

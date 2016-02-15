@@ -1,3 +1,19 @@
+* {
+  margin: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+p {
+    display: block;
+    margin-top: 0;
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+}
+
 .info {
 font:16px Arial, Helvetica, sans-serif;
 background:rgba(255,255,255,0.8);
@@ -12,9 +28,10 @@ margin:0 0 5px;
 }
 
 h1 {
-colour:#000;
+color:#000;
 font-family:Arial, Helvetica, sans-serif;
 text-align:center;
+padding: 8px 0px 8px 0px; 
 }
 
 div.text {
@@ -22,18 +39,28 @@ font-family:Arial, Helvetica, sans-serif;
 font-size:20px;
 width:800px;
 margin:auto;
+padding-top:8px;
 }
 
-.footer {
+.page-wrap {
+  min-height: 100%;
+  margin-bottom: -25px; 
+}
+
+.page-wrap:after {
+  content: "";
+  display: block;
+}
+
+.site-footer, .page-wrap:after {
 font-family:Arial, Helvetica, sans-serif;
-font-size:10px;
+font-size:12px;
 text-align:center;
-padding-top:5px;
+padding-top:8px;
+height: 25px; 
 }
 
 div.map {
-width:100%;
-height:50%;
 margin:auto;
 }
 
@@ -64,5 +91,5 @@ top:1px;
 
 .wrapper {
 text-align:center;
-padding:20px 0 30px;
+padding:20px 0 20px;
 }
