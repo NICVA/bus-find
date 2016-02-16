@@ -165,12 +165,10 @@
       onLocationFound(e);
     });
     map.on('geosearch_foundlocations', function(e) {
-      e.Locations.forEach(function(Location) {
-        e.latitude = Location.Y;
-        e.longitude = Location.X;
-        e.latlng = [Location.X, Location.Y];
-        console.log(e);
-      });
+      e.latitude = e.Locations[0].Y;
+      e.longitude = e.Locations[0].X;
+      e.latlng = [e.Locations[0].X, e.Locations[0].Y];
+      console.log(e);
       document.getElementById('found-address').innerHTML = '<b>Address found:</b> ' + e.Locations[0].Label + '<p>';
       findBus(e);
       findTrain(e);
