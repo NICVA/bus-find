@@ -26,7 +26,7 @@ L.Control.GeoSearch = L.Control.extend({
 
     _config: {
         country: '',
-        searchLabel: 'Search by postcode',
+        searchLabel: 'Search by address',
         notFoundMessage: 'Sorry, address could not be found. Try postcode only.',
         messageHideDelay: 3000,
         zoomLevel: 12
