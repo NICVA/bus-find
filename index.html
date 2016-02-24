@@ -20,7 +20,7 @@
 </head>
 
 <body>
-  <h1>Find your nearest bus stops</h1>
+  <h1>Find your nearest bus stops and trains</h1>
   <div class="map" id="map" style="width:100%; height: 50%" align="center"></div>
   <div class="wrapper">
     <button id="find" onclick="findButtonClick()">Find my bus stop!</button>
@@ -28,11 +28,13 @@
   <div class="text" id="found-address"></div>
   <div class="text" id="bus-bracket"></div>
   <div class="text" id="train-bracket"></div>
+  <div id="translinkapi" align="center"></div>
   <footer class="site-footer">Built by <a href="http://belfast.theodi.org">ODI Belfast</a> with <a href="https://www.opendatani.gov.uk/organization/translink">Translink Open Data</a> (<a href="http://www.nationalarchives.gov.uk/doc/open-government-licence/version/2/">OGL</a>) #opendatani</footer>
 
   <script>
     var busbracket = document.getElementById("bus-bracket");
     var trainbracket = document.getElementById("train-bracket");
+	var translinkapi = document.getElementById("translinkapi");
     busbracket.innerHTML = 'Allow location services, click on the map or enter an address in the search tool to find bus stops near to you';
 
     var StopIcon = L.Icon.extend({
@@ -43,7 +45,7 @@
         popupAnchor: [0, 0]
       }
     });
-
+	
     var metroIcon = new StopIcon({
         iconUrl: 'img/metro-icon.png'
       }),
@@ -53,12 +55,20 @@
       trainIcon = new StopIcon({
         iconUrl: 'img/train-icon.png'
       });
+	
+	var trainmobile = 'http://apis.opendatani.gov.uk/translink/rendermobile.asp?file=';
 
     function findTrain(e) {
       var nearestT = leafletKnn(trainStationLayer).nearest(e.latlng, 1);
       if (nearestT.length) {
         var stop = nearestT[0];
-        var popUpContent = stop.layer.feature.properties.Station;
+		if (stop.layer.feature.properties.Code) {
+			var popUpContent = stop.layer.feature.properties.Station + ' <a target="_blank" href="' + trainmobile + stop.layer.feature.properties.Code + '.xml">View Trains</a>';
+			translinkapi.innerHTML = '<object id="nexttrains" type="text/html" data="' + trainmobile + stop.layer.feature.properties.Code + '.xml" width="60%" height="500"></object>';
+			document.getElementById("nexttrains").style.overflow="scroll";
+		} else {
+			var popUpContent = stop.layer.feature.properties.Station;
+		};
         trainbracket.innerHTML = '<p>Your nearest train or bus station is <b>' + popUpContent + '</b></p>';
         L.marker(stop, {
           icon: trainIcon
@@ -95,6 +105,9 @@
             }
             busbracket.innerHTML += '<br />' + i + '. ' + popUpContent + ']';
           }
+			var group = nearestB;
+			group.push([e.latitude, e.longitude]);
+			map.fitBounds(L.latLngBounds(group));
         }
       } else {
         busbracket.innerHTML = 'No bus stops found';
@@ -116,8 +129,7 @@
 
     function locator() {
       map.locate({
-        setView: true,
-        maxZoom: 15
+        setView: true
       });
     }
 
