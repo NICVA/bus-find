@@ -4,6 +4,7 @@
 <head>
   <title>Bus stop finder #opendatani</title>
   <meta charset="utf-8" />
+  <script>L_PREFER_CANVAS = true;</script>
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7/leaflet.css" />
   <script src="http://cdn.leafletjs.com/leaflet-0.7/leaflet.js"></script>
   <script src="src/l.control.geosearch.js"></script>
@@ -154,8 +155,16 @@
       }
     });
 
-    var busStopLayer = L.geoJson(busstops);
-    var trainStationLayer = L.geoJson(trainstops);
+    var busStopLayer = L.geoJson(busstops, {
+		pointToLayer: function(feature, latlng) {
+			return new L.CircleMarker(latlng, {radius: 0});
+			}
+		});
+    var trainStationLayer = L.geoJson(trainstops, {
+		pointToLayer: function(feature, latlng) {
+			return new L.CircleMarker(latlng, {radius: 0});
+			}
+		});
 
     busStopLayer.addTo(map);
     map.removeLayer(busStopLayer);
